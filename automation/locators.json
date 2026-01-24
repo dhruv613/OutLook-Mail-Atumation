@@ -1,0 +1,31 @@
+{
+  "EMAIL_FIELD": {
+    "name": "loginfmt",
+    "css": "input[name='loginfmt']",
+    "xpath": "//input[@name='loginfmt']"
+  },
+  "NEXT_BUTTON": {
+    "id": "idSIButton9",
+    "css": "#idSIButton9",
+    "xpath": "//*[@id='idSIButton9']"
+  },
+  "SIGN_IN": {
+    "id": "action-oc6171",
+    "css": "#action-oc6171",
+    "xpath": "//*[@id='action-oc6171']",
+    "link_text": "Sign in"
+  },
+  "USE_PASSWORD": {
+    "xpath": "//span[contains(text(),'password')]"
+  },
+
+  "SKIP_FOR_NOW": {
+    "xpath": "//*[@id=\"view\"]/div/div[5]/button[2]"
+  },
+
+  "PRE_USE_PASSWORD": {
+    "xpath": "//*[@id='view']/div/span/div/span"
+  }
+
+
+}
