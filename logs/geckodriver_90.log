@@ -1,0 +1,37 @@
+1769842119606	geckodriver	INFO	Listening on 127.0.0.1:52326
+1769842122676	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "-profile" "C:\\Users\\ASUS\\AppData\\Local\\Temp\\firefox_profile_90_u3t_8xny" "--remote-debugging-port" "52327" "--remote-allow-hosts" "localhost" "-no-remote"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+Dynamically enable window occlusion 0
+1769842122900	Marionette	INFO	Marionette enabled
+1769842122975	Marionette	INFO	Listening on port 52334
+WebDriver BiDi listening on ws://127.0.0.1:52327
+Read port: 52334
+1769842123048	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mailindex.a1ea87aa.js, line 2: Script terminated by timeout at:
+160583/tQ/u<@https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mailindex.a1ea87aa.js:2:38173
+s@https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mailindex.a1ea87aa.js:2:37784
+eD@https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mailindex.a1ea87aa.js:2:129433
+eN@https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mailindex.a1ea87aa.js:2:129474
+eh@https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mailindex.a1ea87aa.js:2:127879
+905963/Fc/e/a<@https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mailindex.a1ea87aa.js:2:323316
+
+JavaScript error: https://www.microsoft.com/etc.clientlibs/onecloud/clientlibs/clientlib-localstorage.ACSHASHb884ef4864d6867bd00aa4a7a5cfb368.min.js, line 1: SyntaxError: redeclaration of let LocalStorageUtil
+JavaScript error: https://www.microsoft.com/etc.clientlibs/onecloud/clientlibs/clientlib-localstorage.ACSHASHb884ef4864d6867bd00aa4a7a5cfb368.min.js, line 1: SyntaxError: redeclaration of let LocalStorageUtil
+JavaScript error: https://www.microsoft.com/golf/etc.clientlibs/onecloud/clientlibs/clientlib-reimagine/main-light.ACSHASHcc031e342c12bdf63196826df67f377a.min.js, line 979: TypeError: can't access property "closest", this.tabPanel is null
+1769842129505	Marionette	WARN	Ignoring event 'DOMContentLoaded' because document has an invalid readyState of 'complete'.
+JavaScript error: https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mail.runtime.29311ee3.js, line 1: ChunkLoadError: Loading chunk 19444 failed.
+(error: https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.19444.m.8e3ccd6e.js)
+JavaScript error: https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.mail.runtime.29311ee3.js, line 1: ChunkLoadError: Loading chunk 15509 failed.
+(error: https://res.public.onecdn.static.microsoft/owamail/hashed-v1/scripts/owa.15509.m.c29b4020.js)
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://login.microsoftonline.com."
+JavaScript warning: https://fpt.live.com/?session_id=d9349a777e0df7a5e9cfc7218eeead00&CustomerId=33e01921-4d64-4f8c-a055-5bdaffd5e33d&PageId=SI, line 5: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://login.live.com."
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://login.live.com."
+console.error: [Exception... "Component is not available"  nsresult: "0x80040111 (NS_ERROR_NOT_AVAILABLE)"  location: "<unknown>"  data: no]
+JavaScript warning: https://res-1.cdn.office.net/midgard/versionless/livepersonacard_without-react_bba949c7e1006220a013.js, line 2: unreachable code after return statement
+console.warn: WindowsJumpLists: "Failed to fetch favicon for " "https://www.microsoft.com/en-us/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook?deeplink=%2Fmail%2F0%2F&sdf=0" [Exception... "Failure"  nsresult: "0x80004005 (NS_ERROR_FAILURE)"  location: "<unknown>"  data: no]
+console.warn: WindowsJumpLists: "Failed to fetch favicon for " "https://www.microsoft.com/en-us/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook?deeplink=%2Fmail%2F0%2F&sdf=0" [Exception... "Failure"  nsresult: "0x80004005 (NS_ERROR_FAILURE)"  location: "<unknown>"  data: no]
+1769843232338	Marionette	INFO	Stopped listening on port 52334
+Dynamically enable window occlusion 1
+console.warn: TopSitesFeed: Failed to fetch data from MARS server: NetworkError when attempting to fetch resource.

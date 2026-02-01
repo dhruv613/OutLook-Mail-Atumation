@@ -1,0 +1,210 @@
+{
+  "PREMIUM_BUTTON": {
+    "xpath": [
+      "//*[@id='owaPremiumButton']",
+      "//button[contains(@aria-label,'Premium')]",
+      "//button[contains(normalize-space(),'Premium')]"
+    ]
+  },
+  "SIGN_IN": {
+    "xpath": [
+      "//a[@aria-label='Sign in to Outlook']",
+      "//a[@data-bi-cn='signin']",
+      "//a[contains(text(),'Sign in')]",
+      "//*[text()='Sign in']"
+    ]
+  },
+  "SKIP_FOR_NOW": {
+    "xpath": [
+      "//button[contains(text(),'Skip for now')]",
+      "//span[contains(text(),'Skip for now')]",
+      "//*[@id='skipButton']"
+    ]
+  },
+  "SKIP_GENERIC": {
+    "xpath": [
+      "//button[contains(text(),'Skip')]",
+      "//button[contains(text(),'Maybe later')]",
+      "//a[contains(text(),'Skip')]"
+    ]
+  },
+  "EMAIL_FIELD": {
+    "xpath": [
+      "//*[@id='i0116']",
+      "//input[@name='loginfmt']",
+      "//input[@type='email']"
+    ]
+  },
+  "NEXT_BUTTON": {
+    "xpath": [
+      "//*[@id='idSIButton9']",
+      "//input[@type='submit']",
+      "//button[contains(., 'Next')]"
+    ]
+  },
+  "USE_PASSWORD": {
+    "xpath": [
+      "//span[@role='button'][contains(.,'password')]",
+      "//button[contains(.,'password')]"
+    ]
+  },
+  "PASSWORD_FIELD": {
+    "xpath": [
+      "//input[@name='passwd']",
+      "//input[@type='password']"
+    ]
+  },
+  "YES_BUTTON": {
+    "xpath": [
+      "//span[normalize-space()='Yes']",
+      "//button[contains(.,'Yes')]",
+      "//*[@id='idSIButton9']"
+    ]
+  },
+  "BACK_BUTTON": {
+    "xpath": [
+      "//*[@id='idBtn_Back']",
+      "//input[@value='Back']",
+      "//button[contains(normalize-space(),'Back')]"
+    ]
+  },
+  "NEW_MAIL": {
+    "css": "button[aria-label='New mail']",
+    "xpath": [
+      "//button[@aria-label='New mail']",
+      "//button[contains(., 'New mail')]",
+      "//span[contains(text(), 'New mail')]",
+      "//div[@role='button'][contains(., 'New mail')]"
+    ]
+  },
+  "TO_FIELD": {
+    "css": "div[id*='MSG_'][id*='_TO'] div[contenteditable='true']",
+    "xpath": [
+      "//div[@role='textbox' and @aria-label='To']",
+      "//input[@aria-label='To']",
+      "//div[contains(@class, 'ms-BasePicker-input')]",
+      "//div[contains(@id,'_TO')]//div[contains(@class,'EditorClass') and @contenteditable='true']",
+      "//*[@id='sug-to']"
+    ]
+  },
+  "BCC_BUTTON": {
+    "xpath": [
+      "//button[normalize-space()='Bcc']",
+      "//button[contains(@aria-label, 'Bcc')]",
+      "//span[text()='Bcc']"
+    ]
+  },
+  "BCC_FIELD": {
+    "css": "div[id*='MSG_'][id*='_BCC'] div[contenteditable='true']",
+    "xpath": [
+      "//div[@role='textbox' and @aria-label='Bcc']",
+      "//input[@aria-label='Bcc']",
+      "//div[contains(@class, 'ms-BasePicker-input')]",
+      "//div[contains(@id,'_BCC')]//div[contains(@class,'EditorClass') and @contenteditable='true']"
+    ]
+  },
+  "SUBJECT_FIELD": {
+    "xpath": [
+      "//input[@aria-label='Subject']",
+      "//input[@placeholder='Add a subject']"
+    ]
+  },
+  "BODY_FIELD": {
+    "xpath": [
+      "//div[@contenteditable='true' and contains(@aria-label,'Message')]"
+    ]
+  },
+  "SEND_BUTTON": {
+    "xpath": [
+      "//button[@aria-label='Send']",
+      "//button[contains(., 'Send')]"
+    ]
+  },
+  "LOGIN_SUCCESS_INDICATORS": {
+    "xpath": [
+      "//button[contains(@aria-label,'New mail')]",
+      "//div[contains(@aria-label,'Message list')]",
+      "//button[contains(.,'New mail')]",
+      "//span[normalize-space()='Home']",
+      "//*[@role='tab' and .//span[contains(text(),'Home')]]"
+    ]
+  },
+  "BLOCKED_INDICATORS": {
+    "xpath": [
+      "//*[contains(text(),'account has been locked')]",
+      "//*[contains(text(),'unusual activity')]",
+      "//*[contains(text(),'Verify your identity')]",
+      "//*[contains(text(),'temporarily blocked')]",
+      "//*[contains(text(),'account suspended')]",
+      "//*[contains(text(),'compliance lock')]",
+      "//*[contains(text(), 'Get a code to sign in')]"
+    ]
+  },
+  "ADD_RECIPIENTS_MODAL": {
+    "xpath": [
+      "//h2[contains(text(), 'Add recipients')]",
+      "//div[@role='dialog']//h2[contains(text(), 'Add recipients')]"
+    ]
+  },
+  "ADD_RECIPIENTS_CANCEL": {
+    "xpath": [
+      "//button[normalize-space()='Cancel']",
+      "//button[contains(@class, 'fui-Button') and text()='Cancel']"
+    ]
+  },
+  "DAILY_LIMIT_REACHED": {
+    "xpath": [
+      "//*[contains(text(), 'daily limit')]",
+      "//*[contains(text(), 'limit reached')]",
+      "//*[contains(text(), 'message limit')]"
+    ]
+  },
+  "SEND_FAILURE_ALERT": {
+    "xpath": [
+      "//*[contains(text(), \"Couldn't send this message\")]",
+      "//div[contains(@role, 'alert') and contains(., \"Couldn't send\")]"
+    ]
+  },
+  "EMAIL_FIELD_FALLBACK": {
+    "xpath": [
+      "//input[@name='loginfmt']",
+      "//input[@type='email']"
+    ]
+  },
+  "NEXT_BUTTON_FALLBACK": {
+    "xpath": [
+      "//input[@type='submit']",
+      "//button[contains(., 'Next')]"
+    ]
+  },
+  "PASSKEY_BYPASS": {
+    "xpath": [
+      "//span[contains(text(),'Other ways to sign in')]",
+      "//a[contains(text(),'Other ways to sign in')]",
+      "//a[contains(text(),'Use your password')]",
+      "//button[contains(text(),'Use your password')]",
+      "//a[contains(text(),'Sign in with a password')]"
+    ]
+  },
+  "PRE_USE_PASSWORD": {
+    "xpath": [
+      "//div[@role='button'][contains(.,'Use your password')]",
+      "//div[contains(text(),'Use your password')]"
+    ]
+  },
+  "TO_FIELD_JS": {
+    "js": "div[aria-label='To'] div[contenteditable='true']"
+  },
+  "BCC_FIELD_JS": {
+    "js": "div[aria-label='Bcc'] div[contenteditable='true']"
+  },
+  "SUBJECT_FIELD_JS": {
+    "js": "input[aria-label='Subject']"
+  },
+  "BODY_FIELD_JS": {
+    "js": "div[contenteditable='true'][aria-label*='Message']"
+  },
+  "COMPOSE_DIALOG": {
+    "css": "div[role='dialog']"
+  }
+}
