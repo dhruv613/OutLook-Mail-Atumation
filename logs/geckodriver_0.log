@@ -13,3 +13,17 @@ Exiting due to channel error.
 Exiting due to channel error.
 Exiting due to channel error.
 Exiting due to channel error.
+1770395854369	geckodriver	INFO	Listening on 127.0.0.1:53953
+1770395857429	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "-profile" "C:\\Users\\ASUS\\AppData\\Local\\Temp\\firefox_profile_0_y1sipcur" "--remote-debugging-port" "53954" "--remote-allow-hosts" "localhost" "-no-remote"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+Dynamically enable window occlusion 0
+1770395858301	Marionette	INFO	Marionette enabled
+1770395858380	Marionette	INFO	Listening on port 53962
+WebDriver BiDi listening on ws://127.0.0.1:53954
+Read port: 53962
+1770395858497	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
