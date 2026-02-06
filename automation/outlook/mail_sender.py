@@ -1,5 +1,6 @@
 import random
 import time
+import json
 import threading
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -10,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from automation.locators import Locators
 from automation.login.login_utils import LoginUtils
 from automation.content.content_manager import ContentManager
-from automation.excel.recipient_excel import RecipientExcelManager
+from automation.data.recipient_manager import RecipientManager
 
 import win32clipboard
 import win32con
@@ -26,7 +27,7 @@ class MailSender:
         self.loc = Locators()
         self.utils = LoginUtils(driver)
         self.content_mgr = ContentManager("c:/Users/ASUS/Desktop/Mail_AutoMation")
-        self.recipient_mgr = RecipientExcelManager(
+        self.recipient_mgr = RecipientManager(
             "c:/Users/ASUS/Desktop/Mail_AutoMation/data/recipient_list.xlsx"
         )
 
@@ -123,7 +124,7 @@ class MailSender:
             self._handle_unexpected_modal()
 
             # Retry with JS Fallback
-            js_script = f"return document.querySelector('{self.loc.get_js('TO_FIELD_JS')}');"
+            js_script = f"return document.querySelector({json.dumps(self.loc.get_js('TO_FIELD_JS'))});"
             to_input = self._retry_find("TO_FIELD", js_fallback=js_script, timeout=1.0, retries=5)
 
             if not to_input:
@@ -157,7 +158,7 @@ class MailSender:
         try:
             # 1. OPTIMIZATION: Instant JS Check for BCC field visibility
             js_is_visible = f"""
-                var bcc = document.querySelector('{self.loc.get_js('BCC_FIELD_JS')}');
+                var bcc = document.querySelector({json.dumps(self.loc.get_js('BCC_FIELD_JS'))});
                 return bcc && bcc.offsetParent !== null;
             """
             is_visible = self.driver.execute_script(js_is_visible)
@@ -171,7 +172,7 @@ class MailSender:
             self._handle_unexpected_modal()
 
             # Retry with JS Fallback
-            js_script = f"return document.querySelector('{self.loc.get_js('BCC_FIELD_JS')}');"
+            js_script = f"return document.querySelector({json.dumps(self.loc.get_js('BCC_FIELD_JS'))});"
             bcc_input = self._retry_find("BCC_FIELD", js_fallback=js_script, timeout=1.0, retries=5)
 
             if not bcc_input:
@@ -200,7 +201,7 @@ class MailSender:
     # ---------------------------------------------------------
     # COMPOSE + SEND
     # ---------------------------------------------------------
-    def _compose_and_send(self, to_email, bcc_list, subject, body):
+    def _compose_and_send(self, to_email, bcc_list, subject, body, check_limit=True):
         self._safe_action()
         # NEW MAIL
         if not self.utils.safe_click_any(self.loc.get_locators("NEW_MAIL"), timeout=0.3):
@@ -226,7 +227,7 @@ class MailSender:
             return False
 
         # SUBJECT
-        js_subj = f"return document.querySelector('{self.loc.get_js('SUBJECT_FIELD_JS')}');"
+        js_subj = f"return document.querySelector({json.dumps(self.loc.get_js('SUBJECT_FIELD_JS'))});"
         subject_input = self._retry_find("SUBJECT_FIELD", js_fallback=js_subj, retries=2)
         
         if not subject_input:
@@ -244,7 +245,7 @@ class MailSender:
         subject_input.send_keys(Keys.CONTROL, "v", Keys.TAB)
 
         # BODY
-        js_body = f"return document.querySelector('{self.loc.get_js('BODY_FIELD_JS')}');"
+        js_body = f"return document.querySelector({json.dumps(self.loc.get_js('BODY_FIELD_JS'))});"
         body_input = self._retry_find("BODY_FIELD", js_fallback=js_body, retries=2)
 
         if not body_input:
@@ -284,19 +285,19 @@ class MailSender:
             # Compose still open -> send probably failed
             print("⚠️ Compose dialog still open after Send (possible failure)")
 
-        # --- DAILY LIMIT CHECK (3 Attempts) ---
-        # print("🔍 checking limit reached...")
-        for i in range(3):
+        # --- DAILY LIMIT CHECK (Once) ---
+        # User Logic: Check once after send, but only for first 3 emails (controlled by check_limit arg)
+        if check_limit:
+            # print("🔍 checking limit reached (Once)...")
             if self._check_daily_limit():
                 print("🛑 Daily Limit Reached detected!")
                 return "LIMIT_REACHED"
-            
-            # Check for "Couldn't send this message" alert
-            if self.utils.safe_find_any(self.loc.get_locators("SEND_FAILURE_ALERT"), timeout=0.5):
-                print("🛑 Send Failure Alert detected!")
-                return "ALERT_FAILED"
-                
         
+        # Check for "Couldn't send this message" alert (Always check strictly? or also skip? keeping it for safety)
+        if self.utils.safe_find_any(self.loc.get_locators("SEND_FAILURE_ALERT"), timeout=1):
+            print("🛑 Send Failure Alert detected!")
+            return "ALERT_FAILED"
+                
         return True
 
     def _check_daily_limit(self):
@@ -313,7 +314,7 @@ class MailSender:
     # MAIN LOOP
     # ---------------------------------------------------------
     def send_process(self, start_round=1):
-        count_to_send = random.randint(27, 28)
+        count_to_send = random.randint(18, 20)
         print(f"📧 Sending {count_to_send} emails")
         
         sent_count_session = 0
@@ -325,15 +326,12 @@ class MailSender:
 
             print(f"--- 📨 Email {i}/{count_to_send} ---")
             
-            # 0. Pre-Email Limit Check
-            if self._check_daily_limit():
-                print("🛑 Daily Limit Reached (Pre-Send Check).")
-                if self.sender_excel_mgr:
-                    self.sender_excel_mgr.update_status(self.sender_row, "USED-L")
-                return False, sent_count_session
+            # 0. Pre-Email Limit Check REMOVED (User Request: Single check post-send)
+            # should_check_limit = (sent_count_session < 3)
+            # if should_check_limit ... REMOVED
 
             bcc_list, rows = self.recipient_mgr.get_batch_recipients(
-                random.randint(25, 30), self.sender_row or 0
+                random.randint(40, 45), self.sender_row or 0
             )
 
             if not bcc_list:
@@ -342,7 +340,7 @@ class MailSender:
             subject = self.content_mgr.get_random_subject()
             body = self.content_mgr.get_random_body()
 
-            result = self._compose_and_send(self.to_email_id, bcc_list, subject, body)
+            result = self._compose_and_send(self.to_email_id, bcc_list, subject, body, check_limit=True)
 
             # LIMIT REACHED HANDLING
             if result == "LIMIT_REACHED":
@@ -354,10 +352,10 @@ class MailSender:
 
             # ALERT FAILED HANDLING
             if result == "ALERT_FAILED":
-                print(f"🛑 Send Failure Alert for {self.current_email} -> Marking USED (Alert Detected)")
+                print(f"🛑 Send Failure Alert for {self.current_email} -> Marking USED-L (Alert Detected)")
                 if self.sender_excel_mgr:
-                     # User detected "Couldn't send", requested to mark as USED so it doesn't retry infinitely
-                     self.sender_excel_mgr.mark_sender_used(self.sender_row, sent_count_session)
+                     # User requested "Send Failure Alert" be treated as Daily Limit (USED-L)
+                     self.sender_excel_mgr.update_status(self.sender_row, "USED-L")
                 self.recipient_mgr.update_batch_status(rows, None)
                 return False, sent_count_session
 

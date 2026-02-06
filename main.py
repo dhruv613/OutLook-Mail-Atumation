@@ -14,6 +14,8 @@ from automation.data.sync_manager import SyncManager
 
 def main():
     # 1. Check Firefox is available
+    start_time = time.time()
+
     temp_mgr = BrowserManager()
     if not temp_mgr._find_browser_path("firefox"):
         print("Firefox not found! Please install Firefox or check BROWSER_PATHS in config.py")
@@ -107,7 +109,14 @@ def main():
     
     speak = wincl.Dispatch("SAPI.SpVoice")
     speak.Speak("Automation finished.") 
+    end_time = time.time()
+    total_seconds = end_time - start_time
+    minutes = int(total_seconds // 60)
+    seconds = int(total_seconds % 60)
+    
     print("\n--- Automation Summary ---")
+    print(f"⏱️ Total Runtime: {minutes}m {seconds}s")
+
     
     # 5. Export DB -> Excel
     sync_mgr.export_to_excel()
@@ -148,7 +157,16 @@ def main():
     else:
         print("\n⚠️ Not Logined IDs: None")
 
-    # 5. Count of Used Recipients
+    # 5. Limit Reached IDs
+    limit_reached_accounts = excel_mgr.get_limit_reached_accounts()
+    if limit_reached_accounts:
+        print("\n🛑 Limit Reached IDs (USED-L):")
+        for email in limit_reached_accounts:
+            print(f"- {email}")
+    else:
+        print("\n🛑 Limit Reached IDs: None")
+
+    # 6. Count of Used Recipients
     rec_mgr = RecipientManager()
     used_recipients_count = rec_mgr.get_used_count()
     print(f"\n📊 Total used recipients: {used_recipients_count}")

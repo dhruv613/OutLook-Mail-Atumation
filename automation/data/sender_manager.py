@@ -9,6 +9,7 @@ class SenderStatus:
     NEED_PREMIUM = "NEED_PREMIUM"
     FAILED = "FAILED"
     NOT_LOGINED = "NOT_LOGINED"
+    USED_L = "USED-L"
 
 class SenderManager:
     # Mimic the interface of SenderExcelManager
@@ -75,6 +76,10 @@ class SenderManager:
     def _update_status(self, row_idx, status):
         self.db.execute("UPDATE senders SET status = ? WHERE original_row = ?", (status, row_idx))
 
+    def update_status(self, row_idx, status):
+        """Public wrapper for _update_status to match MailSender expectation."""
+        self._update_status(row_idx, status)
+
     def mark_sender_pending(self, row):
         self._update_status(row, SenderStatus.PENDING)
 
@@ -94,6 +99,9 @@ class SenderManager:
     def mark_sender_blocked(self, row):
         self._update_status(row, SenderStatus.BLOCKED)
 
+    def mark_sender_limit_reached(self, row):
+        self._update_status(row, SenderStatus.USED_L)
+
     def mark_sender_logged_in(self, row):
         self._update_status(row, SenderStatus.LOGGED_IN)
 
@@ -107,7 +115,8 @@ class SenderManager:
     def mark_sender_failed(self, row):
         # Check if blocked first?
         curr = self.db.fetch_one("SELECT status FROM senders WHERE original_row = ?", (row,))
-        if curr and curr['status'] == SenderStatus.BLOCKED:
+        if curr and curr['status'] in [SenderStatus.BLOCKED, SenderStatus.USED_L, SenderStatus.USED]:
+            # print(f"ℹ️ Skipping mark_failed for Row {row} (Status: {curr['status']})")
             return
 
         self._update_status(row, SenderStatus.FAILED)
@@ -124,7 +133,8 @@ class SenderManager:
     def get_pending_rows(self):
         query = """
             SELECT original_row FROM senders 
-            WHERE status = 'PENDING' OR status = 'NOT_LOGINED' OR status = 'FAILED' OR status LIKE 'PENDING:%'
+            WHERE (status IS NULL OR status = '' OR status = 'PENDING' OR status = 'NOT_LOGINED' OR status = 'FAILED' OR status LIKE 'PENDING:%')
+            AND status != 'USED-L' AND status != 'BLOCKED' AND status NOT LIKE 'USED%'
         """
         rows = self.db.fetch_all(query)
         return [r['original_row'] for r in rows]
@@ -138,7 +148,13 @@ class SenderManager:
         return result_map
 
     def get_used_accounts(self):
-        query = "SELECT email FROM senders WHERE status LIKE 'USED%'"
+        # Only standard USED or USED-R (Reuse) or USED-L (Limit)
+        query = "SELECT email FROM senders WHERE status = 'USED' OR status LIKE 'USED-R%' OR status = 'USED-L'"
+        rows = self.db.fetch_all(query)
+        return [r['email'] for r in rows]
+
+    def get_limit_reached_accounts(self):
+        query = "SELECT email FROM senders WHERE status = 'USED-L'"
         rows = self.db.fetch_all(query)
         return [r['email'] for r in rows]
 

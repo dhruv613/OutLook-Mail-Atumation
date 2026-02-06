@@ -27,7 +27,7 @@ class MultiBrowserWorker(threading.Thread):
                 if mgr: mgr.close_browser()
             except: pass
             
-            mgr = BrowserManager(browser_name=self.browser_name, incognito=True, instance_id=self.worker_id)
+            mgr = BrowserManager(browser_name=self.browser_name, incognito=True, instance_id=self.worker_id - 1)
             driver = mgr.launch_browser()
             return driver
 
@@ -50,9 +50,15 @@ class MultiBrowserWorker(threading.Thread):
                 
                 if not success:
                     if self.is_retry:
-                            # Re-read status to check if it wasn't blocked (if blocked, it's already marked blocked)
-                            handler.excel.mark_sender_failed(row)
-                            print(f"{prefix} ❌ Retry failed for Row {row} → Marked FAILED.")
+                            # Re-read status to check if it wasn't blocked/limit-reached
+                            # Check status via handler's excel manager
+                            _, _, curr_status, _ = handler.excel.get_sender_by_row(row)
+                            
+                            if curr_status in ["USED-L", "BLOCKED"] or (curr_status and curr_status.startswith("USED")):
+                                print(f"{prefix} ℹ️ Retry finished but status is '{curr_status}'. Preserving status.")
+                            else:
+                                handler.excel.mark_sender_failed(row)
+                                print(f"{prefix} ❌ Retry failed for Row {row} → Marked FAILED.")
                 
                 # Small delay between accounts
                 time.sleep(2)

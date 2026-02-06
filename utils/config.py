@@ -21,7 +21,7 @@ DETACH = True
 INCOGNITO = True
 
 # Multi-Firefox Parallel Config
-PARALLEL_FIREFOX_INSTANCES = 4  # Number of Firefox browsers to run simultaneously
+PARALLEL_FIREFOX_INSTANCES = 6  # Number of Firefox browsers to run simultaneously
 STAGGER_DELAY_MIN = 2  # Minimum seconds between each browser launch
 STAGGER_DELAY_MAX = 5  # Maximum seconds between each browser launch
 

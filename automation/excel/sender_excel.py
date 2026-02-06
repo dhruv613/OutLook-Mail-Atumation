@@ -94,10 +94,7 @@ class SenderExcelManager:
                     # I will follow original logic: Keep critical statuses.
                     
                     safe_statuses = [
-                        SenderStatus.USED, 
                         SenderStatus.BLOCKED, 
-                        SenderStatus.FAILED, 
-                        SenderStatus.NOT_LOGINED,
                         SenderStatus.NEED_PREMIUM
                     ]
                     

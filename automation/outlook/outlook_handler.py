@@ -77,6 +77,13 @@ class OutlookHandler:
                     return True
                 else:
                     print(f"⚠️ Mail Process Failed/Incomplete ({email})")
+                    
+                    # Check current status
+                    _, _, current_status, _ = self.excel.get_sender_by_row(row)
+                    if current_status == "USED-L":
+                        print(f"✅ Limit Reached (USED-L) - Process Considered Complete.")
+                        return True # Return TRUE so worker doesn't think it failed
+
                     # Only mark PENDING if no mails sent (and thus likely no USED-R/USED-L status set)
                     if sent_count == 0:
                         self.excel.mark_sender_pending(row)

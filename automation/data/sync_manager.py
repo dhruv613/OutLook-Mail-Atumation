@@ -103,6 +103,10 @@ class SyncManager:
                 # Reset USED.
                 pass
             
+            # [NEW] Always reset FAILED status to allow retry on new run
+            if status == "FAILED": 
+                 status = None
+            
             senders_data.append((email, password, status, 0, row))
 
         # Bulk Insert (Upsert)
