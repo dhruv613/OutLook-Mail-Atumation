@@ -68,11 +68,23 @@ class SyncManager:
                 ws.cell(row=header_row, column=status_col).value = today_str 
                 is_new_day = True
                 
+                # Logic: Reset USED, USED-L, BLOCKED, FAILED. Keep NEED_PREMIUM.
+                # Note: Original code kept NOT_LOGINED? Usually we want to retry those? 
+                
                 # IMMEDIATE FIX: Reset statuses in the Excel file itself to prevent 'trap' state on crash
                 print("   ...Cleaning Excel file statuses safely...")
                 for r in range(2, ws.max_row + 1):
                     val = ws.cell(row=r, column=status_col).value
-                    if val and "USED" in str(val).upper():
+                    s_val = str(val).strip().upper() if val else ""
+                    
+                    # RESET LIST: USED, USED-L, BLOCKED, FAILED
+                    if (
+                        s_val == "USED" or 
+                        s_val == "USED-L" or 
+                        "USED" in s_val or 
+                        s_val == "BLOCKED" or 
+                        s_val == "FAILED"
+                    ):
                         ws.cell(row=r, column=status_col).value = None
                         
                 wb.save(SENDER_EXCEL_PATH)
@@ -94,18 +106,29 @@ class SyncManager:
             email = str(email).strip()
             status = str(status).strip() if status else None
             
-            # Apply Reset Logic
+            # Apply Reset Logic (Redundant if Excel was cleaned, but good for in-memory safety)
             if is_new_day:
-                if status == "USED" or (status and "USED" in status):
+                s_status = status.upper() if status else ""
+                if (
+                    s_status == "USED" or 
+                    s_status == "USED-L" or 
+                    "USED" in s_status or 
+                    s_status == "BLOCKED" or 
+                    s_status == "FAILED"
+                ):
                     status = None # Reset to Available
-                # Keep BLOCKED, FAILED, NOT_LOGINED? 
-                # Plan says: Keep BLOCKED, FAILED, NOT_LOGINED, NEED_PREMIUM.
-                # Reset USED.
-                pass
             
-            # [NEW] Always reset FAILED status to allow retry on new run
-            if status == "FAILED": 
-                 status = None
+            # [REMOVED] Always reset FAILED status to allow retry on new run
+            # Reason: We now handle FAILED reset in New Day logic.
+            # If user restarts script same day, FAILED accounts should fail? 
+            # Or should they be retried?
+            # User request: "if new day arrive then reset all status : 'USED', 'USED-L', 'BLOCKED', 'FAILED'"
+            # Implies: If NOT new day, Keep FAILED?
+            # Existing logic was: Always reset FAILED.
+            # I will Isolate FAILED reset to New Day only as requested.
+            # So I will COMMENT OUT this block.
+            # if status == "FAILED": 
+            #      status = None
             
             senders_data.append((email, password, status, 0, row))
 

@@ -314,7 +314,7 @@ class MailSender:
     # MAIN LOOP
     # ---------------------------------------------------------
     def send_process(self, start_round=1):
-        count_to_send = random.randint(18, 20)
+        count_to_send = random.randint(22, 23)
         print(f"📧 Sending {count_to_send} emails")
         
         sent_count_session = 0
@@ -331,7 +331,7 @@ class MailSender:
             # if should_check_limit ... REMOVED
 
             bcc_list, rows = self.recipient_mgr.get_batch_recipients(
-                random.randint(40, 45), self.sender_row or 0
+                random.randint(35, 40), self.sender_row or 0
             )
 
             if not bcc_list:
@@ -373,7 +373,7 @@ class MailSender:
                 return False, sent_count_session
 
             # Success
-            self.recipient_mgr.update_batch_status(rows, "USED")
+            self.recipient_mgr.update_batch_status(rows, "USED", "USED-L", "USED-R")
             sent_count_session += 1
             # time.sleep(random.uniform(1, 2)) # REMOVED as per USER REQUEST
 

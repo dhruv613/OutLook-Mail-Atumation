@@ -24,6 +24,7 @@ USE_AUTHENTICATED_PROXIES = False   # Check if you have user:pass proxies
 PROXY_LIST = [
     "192.168.1.10:8000",
     "192.168.1.11:8000",
+    
     # Add more IPs here if you have more instances...
 ]
 
