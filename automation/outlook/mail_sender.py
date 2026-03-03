@@ -1,3 +1,4 @@
+import os
 import random
 import time
 import json
@@ -26,9 +27,14 @@ class MailSender:
 
         self.loc = Locators()
         self.utils = LoginUtils(driver)
-        self.content_mgr = ContentManager("c:/Users/ASUS/Desktop/Mail_AutoMation")
+        
+        # Determine base directory (project root)
+        # automation/outlook/mail_sender.py -> .../automation/outlook -> .../automation -> .../
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        
+        self.content_mgr = ContentManager(base_dir)
         self.recipient_mgr = RecipientManager(
-            "c:/Users/ASUS/Desktop/Mail_AutoMation/data/recipient_list.xlsx"
+            os.path.join(base_dir, "data", "recipient_list.xlsx")
         )
 
         self.to_email_id = "zoedebtcollector@gmail.com"
@@ -117,6 +123,29 @@ class MailSender:
                 actions.perform()
         except Exception as e:
             print(f"⚠️ Modal handler warning: {e}")
+            
+        # Check for 'Download App' modal (User reported)
+        try:
+             if self.utils.safe_find_any(self.loc.get_locators("DOWNLOAD_APP_MODAL"), timeout=1):
+                print("⚠️ 'Download App' modal detected in Sender - Closing...")
+                actions = ActionChains(self.driver)
+                actions.send_keys(Keys.ESCAPE)
+                actions.perform()
+        except:
+            pass
+
+
+    def _handle_attachment_reminder(self):
+        """Check for 'Attachment reminder' popup and click Send if found."""
+        try:
+             # Look for the dialog and click Send
+             # User requested decrease wait time (1-2 sec) -> Set to 1.0s
+             if self.utils.safe_click_any(self.loc.get_locators("ATTACHMENT_REMINDER_SEND"), timeout=1.0):
+                print("⚠️ Attachment reminder detected - Clicked Send.")
+                return True
+        except Exception as e:
+            print(f"⚠️ Attachment reminder warning: {e}")
+        return False
 
     def _fill_to_field(self, email):
         try:
@@ -139,6 +168,10 @@ class MailSender:
             except Exception:
                 print("⚠️ Title intercept/Loading screen detected - forcing JS click (TO)")
                 self.driver.execute_script("arguments[0].click();", to_input)
+
+            # --- Clear existing addresses to prevent duplication ---
+            to_input.send_keys(Keys.CONTROL, "a")
+            to_input.send_keys(Keys.DELETE)
 
             self._copy_to_clipboard(email)
             
@@ -186,6 +219,10 @@ class MailSender:
             except Exception:
                 print("⚠️ Intercept detected - forcing JS click (BCC)")
                 self.driver.execute_script("arguments[0].click();", bcc_input)
+
+            # --- Clear existing addresses to prevent duplication ---
+            bcc_input.send_keys(Keys.CONTROL, "a")
+            bcc_input.send_keys(Keys.DELETE)
 
             emails = "\n".join(bcc_list)
             self._copy_to_clipboard(emails)
@@ -258,6 +295,7 @@ class MailSender:
             print("⚠️ Body intercept - forcing JS click")
             self.driver.execute_script("arguments[0].click();", body_input)
             
+            print(f"DEBUG: Body content to paste: {repr(body)}")
         self._copy_to_clipboard(body)
         body_input.send_keys(Keys.CONTROL, "v")
         # time.sleep(0.5) # REMOVED for speed
@@ -267,6 +305,8 @@ class MailSender:
             print("❌ Send button missing")
             return False
         
+        # --- ATTACHMENT REMINDER HANDLING ---
+        self._handle_attachment_reminder()
         
         self._safe_action()
 
@@ -284,6 +324,8 @@ class MailSender:
         except Exception:
             # Compose still open -> send probably failed
             print("⚠️ Compose dialog still open after Send (possible failure)")
+            self._handle_stuck_compose()
+            return False
 
         # --- DAILY LIMIT CHECK (Once) ---
         # User Logic: Check once after send, but only for first 3 emails (controlled by check_limit arg)
@@ -310,14 +352,40 @@ class MailSender:
             pass
         return False
 
+    def _handle_stuck_compose(self):
+        """Dedicated fallback function to clean up a stuck compose dialog without affecting normal send time."""
+        print("⚠️ Attempting to clear stuck compose dialog via ESC and Refresh...")
+        try:
+            actions = ActionChains(self.driver)
+            # Press ESC multiple times in case of nested popups (e.g. autocomplete)
+            actions.send_keys(Keys.ESCAPE).perform()
+            time.sleep(0.5)
+            actions.send_keys(Keys.ESCAPE).perform()
+            time.sleep(1)
+            
+            # Check if dialog closed
+            dialog_strategies = self.loc.get_locators("COMPOSE_DIALOG")
+            if dialog_strategies and self.utils.safe_find_any(dialog_strategies, timeout=1):
+                print("⚠️ Dialog still present after ESC, refreshing page to forcefully exit...")
+                self.driver.refresh()
+                # Only incur the 5s wait if we actually had to refresh due to a stuck dialog
+                time.sleep(5)
+            else:
+                print("✅ Stuck dialog closed via ESC.")
+        except Exception as e:
+            print(f"⚠️ Error during stuck compose cleanup: {e}")
+            self.driver.refresh()
+            time.sleep(5)
+
     # ---------------------------------------------------------
     # MAIN LOOP
     # ---------------------------------------------------------
     def send_process(self, start_round=1):
-        count_to_send = random.randint(22, 23)
+        count_to_send = random.randint(26, 30)
         print(f"📧 Sending {count_to_send} emails")
         
         sent_count_session = 0
+        consecutive_failures = 0
 
         for i in range(start_round, count_to_send + 1):
             if not self._is_driver_alive():
@@ -326,20 +394,17 @@ class MailSender:
 
             print(f"--- 📨 Email {i}/{count_to_send} ---")
             
-            # 0. Pre-Email Limit Check REMOVED (User Request: Single check post-send)
-            # should_check_limit = (sent_count_session < 3)
-            # if should_check_limit ... REMOVED
-
             bcc_list, rows = self.recipient_mgr.get_batch_recipients(
-                random.randint(35, 40), self.sender_row or 0
+                random.randint(30, 35), self.sender_row or 0
             )
 
             if not bcc_list:
+                print(f"⚠️ DEBUG: bcc_list is empty for {self.current_email}")
                 return False, sent_count_session
 
             subject = self.content_mgr.get_random_subject()
             body = self.content_mgr.get_random_body()
-
+            
             result = self._compose_and_send(self.to_email_id, bcc_list, subject, body, check_limit=True)
 
             # LIMIT REACHED HANDLING
@@ -354,28 +419,34 @@ class MailSender:
             if result == "ALERT_FAILED":
                 print(f"🛑 Send Failure Alert for {self.current_email} -> Marking USED-L (Alert Detected)")
                 if self.sender_excel_mgr:
-                     # User requested "Send Failure Alert" be treated as Daily Limit (USED-L)
                      self.sender_excel_mgr.update_status(self.sender_row, "USED-L")
                 self.recipient_mgr.update_batch_status(rows, None)
                 return False, sent_count_session
 
             if not result:
-                print("❌ Compose/Send failed.")
-                # PARTIAL SUCCESS CHECK (USED-R)
-                if sent_count_session > 0:
-                    print(f"⚠️ Partial success ({sent_count_session} sent). Marking USED-R.")
-                    if self.sender_excel_mgr:
-                        self.sender_excel_mgr.mark_sender_used_reuse(self.sender_row, sent_count_session)
-                else:
-                    print(f"⚠️ Failed completely (0 sent).")
+                consecutive_failures += 1
+                print(f"❌ Compose/Send failed (Failure {consecutive_failures}/3).")
+                self.recipient_mgr.update_batch_status(rows, None) # Release recipients
 
-                self.recipient_mgr.update_batch_status(rows, None)
-                return False, sent_count_session
+                if consecutive_failures >= 3:
+                     print("🛑 Max consecutive failures reached. Aborting session.")
+                     # PARTIAL SUCCESS CHECK (USED-R)
+                     if sent_count_session > 0:
+                        print(f"⚠️ Partial success ({sent_count_session} sent). Marking USED-R.")
+                        if self.sender_excel_mgr:
+                            self.sender_excel_mgr.mark_sender_used_reuse(self.sender_row, sent_count_session)
+                     else:
+                        print(f"⚠️ Failed completely (0 sent).")
+                     return False, sent_count_session
+                else:
+                    print("🔄 Retrying with next batch/recipient...")
+                    time.sleep(2) 
+                    continue
 
             # Success
-            self.recipient_mgr.update_batch_status(rows, "USED", "USED-L", "USED-R")
+            consecutive_failures = 0 # Reset counter on success
+            self.recipient_mgr.update_batch_status(rows, "USED")
             sent_count_session += 1
-            # time.sleep(random.uniform(1, 2)) # REMOVED as per USER REQUEST
 
         print(f"🏁 Done (Sent {count_to_send})")
         return True, sent_count_session

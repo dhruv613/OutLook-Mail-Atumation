@@ -2,7 +2,7 @@ import time
 import functools
 from utils.logger import logger
 
-def retry(exceptions, tries=3, delay=1, backoff=2):
+def retry(exceptions, tries=5, delay=1, backoff=2):
     """
     Retry decorator with exponential backoff.
     

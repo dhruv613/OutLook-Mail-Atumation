@@ -148,8 +148,8 @@ class SenderManager:
         return result_map
 
     def get_used_accounts(self):
-        # Only standard USED or USED-R (Reuse) or USED-L (Limit)
-        query = "SELECT email FROM senders WHERE status = 'USED' OR status LIKE 'USED-R%' OR status = 'USED-L'"
+        # Match 'USED', 'USED (21)', 'USED-R', AND 'USED-L' (User Request: Include USED-L in Used IDs)
+        query = "SELECT email FROM senders WHERE status LIKE 'USED%' OR status LIKE 'USED-R%'"
         rows = self.db.fetch_all(query)
         return [r['email'] for r in rows]
 

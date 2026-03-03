@@ -104,19 +104,8 @@ class SyncManager:
             if not email: continue
             
             email = str(email).strip()
-            status = str(status).strip() if status else None
-            
-            # Apply Reset Logic (Redundant if Excel was cleaned, but good for in-memory safety)
-            if is_new_day:
-                s_status = status.upper() if status else ""
-                if (
-                    s_status == "USED" or 
-                    s_status == "USED-L" or 
-                    "USED" in s_status or 
-                    s_status == "BLOCKED" or 
-                    s_status == "FAILED"
-                ):
-                    status = None # Reset to Available
+            # Normalize status to uppercase for consistent counting (User fix)
+            status = str(status).strip().upper() if status else None
             
             # [REMOVED] Always reset FAILED status to allow retry on new run
             # Reason: We now handle FAILED reset in New Day logic.
@@ -208,6 +197,11 @@ class SyncManager:
                 else:
                     # Legacy status without date -> Reset
                     db_status = None 
+            
+            # Reset specific statuses to None at startup
+            match db_status:
+                case "PROCESSING" | "USED" | "USED-L" | "FAILED" | "NOT_LOGINED" | "BLOCKED":
+                     db_status = None
             
             recipients_data.append((email, db_status, row))
 

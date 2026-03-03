@@ -40,7 +40,7 @@ class ContentManager:
                         for para in doc.paragraphs:
                             full_text.append(para.text)
                         
-                        body_content = "\n".join(full_text)
+                        body_content = "\r\n".join(full_text)
                         if body_content.strip():
                            self.templates.append(body_content)
                     except Exception as e:

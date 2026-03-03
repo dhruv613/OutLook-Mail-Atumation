@@ -107,9 +107,22 @@ class BrowserManager:
         options.set_preference("media.navigator.enabled", False)
         
         # Memory optimization for multiple instances
+        # 1. Disable Disk Cache (already done, ensuring it)
         options.set_preference("browser.cache.disk.enable", False)
-        options.set_preference("browser.cache.memory.enable", True)
-        options.set_preference("browser.sessionhistory.max_entries", 5)
+        
+        # 2. Disable Memory Cache (FORCE RAM SAVING) - User Request: "clear data... load is decrease"
+        options.set_preference("browser.cache.memory.enable", False)
+        options.set_preference("browser.cache.memory.capacity", 0)
+        options.set_preference("browser.cache.offline.enable", False)
+        options.set_preference("network.http.use-cache", False)
+
+        # 3. Reduce History
+        options.set_preference("browser.sessionhistory.max_entries", 2)
+        options.set_preference("browser.sessionhistory.max_total_viewers", 0) # Disable "bfcache" (Back/Forward cache)
+
+        # 4. Enforce Private Browsing / Incognito (Stateless) - DISABLED per user request
+        # options.set_preference("browser.privatebrowsing.autostart", True)
+        # options.add_argument("-private")
         
         # Proxy support (loaded from proxy_config.py)
         try:
@@ -146,10 +159,13 @@ class BrowserManager:
 
             "firefox": {
                 "driver": webdriver.Firefox,
-                "service": lambda: FirefoxService(
-                    executable_path=get_geckodriver_path(),
-                    log_output=os.path.join(LOGS_DIR, f"geckodriver_{self.instance_id}.log")
-                ),
+                "service": lambda: (
+                    os.makedirs(LOGS_DIR, exist_ok=True),
+                    FirefoxService(
+                        executable_path=get_geckodriver_path(),
+                        log_output=os.path.join(LOGS_DIR, f"geckodriver_{self.instance_id}.log")
+                    )
+                )[1],
                 "options": self._get_firefox_options()
             }
 
@@ -188,22 +204,13 @@ class BrowserManager:
             if self.browser_name == "firefox":
                 self.driver.maximize_window()
             
-            # Anti-Detection: Hide navigator.webdriver for Chromium browsers
-            if self.browser_name in ["chrome", "brave", "vivaldi"]:
-                try:
-                    self.driver.execute_cdp_cmd(
-                        "Page.addScriptToEvaluateOnNewDocument",
-                        {
-                            "source": """
-                            Object.defineProperty(navigator, 'webdriver', {
-                                get: () => undefined
-                            });
-                            """
-                        },
-                    )
-                    # print(f"🕵️ Automation detection hidden for {self.browser_name}.")
-                except Exception as cdp_error:
-                    print(f"⚠️ Failed to hide automation detection: {cdp_error}")
+            # Increase page load timeout to 120s (User Request)
+            try:
+                self.driver.set_page_load_timeout(120)
+            except:
+                pass
+            
+
 
             # print(f"✅ {self.browser_name.capitalize()} launched successfully.")
             return self.driver
@@ -221,13 +228,3 @@ class BrowserManager:
                 pass
 
 
-# ======================
-# Example Usage (only for testing)
-# ======================
-if __name__ == "__main__":
-    manager = BrowserManager("chrome")
-    driver = manager.launch_browser()
-    if driver:
-        driver.get("https://www.google.com")
-        input("Press Enter to close browser...")
-        manager.close_browser()

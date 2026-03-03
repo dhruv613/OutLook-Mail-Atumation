@@ -51,7 +51,9 @@ class Login:
                         print(f"DEBUG: Failure URL: {self.driver.current_url}")
                         print(f"DEBUG: Failure Title: {self.driver.title}")
                         
-                        screenshot_dir = "d:/Mail_AutoMation/logs/screenshots"
+                        # Determine base directory (project root)
+                        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                        screenshot_dir = os.path.join(base_dir, "logs", "screenshots")
                         if not os.path.exists(screenshot_dir):
                             os.makedirs(screenshot_dir)
                             
@@ -289,6 +291,28 @@ class Login:
             if self.utils.safe_click_any(self.loc.get_locators("YES_BUTTON"), timeout=0.1): return True
             if self.utils.safe_click_any(self.loc.get_locators("SKIP_FOR_NOW"), timeout=0.1): return True
             if self.utils.safe_click_any(self.loc.get_locators("SKIP_GENERIC"), timeout=0.1): return True
+            
+            # --- NEW POPUP HANDLING ---
+            # 1. Continue to sign in (Redirection Page)
+            if self.utils.safe_click_any(self.loc.get_locators("CONTINUE_TO_SIGN_IN"), timeout=0.5):
+                print("⚠️ Clicked 'Continue to sign in'...")
+                time.sleep(1)
+
+            # 2. Download App Modal
+            if self.utils.safe_find_any(self.loc.get_locators("DOWNLOAD_APP_MODAL"), timeout=0.5):
+                print("⚠️ 'Download the free app' modal detected - Closing...")
+                # Try Close Button
+                if self.utils.safe_click_any(self.loc.get_locators("DOWNLOAD_APP_CLOSE"), timeout=1):
+                     pass
+                else:
+                    # Fallback to ESC
+                    print("⚠️ Close button failed, trying ESC...")
+                    try:
+                        hotkey('esc')
+                    except: 
+                        pass
+                time.sleep(0.5)
+            # --------------------------
             
             time.sleep(0.5)
 

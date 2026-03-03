@@ -206,5 +206,29 @@
   },
   "COMPOSE_DIALOG": {
     "css": "div[role='dialog']"
+  },
+  "DOWNLOAD_APP_MODAL": {
+    "xpath": [
+      "//*[contains(text(), 'Download the free app')]"
+    ]
+  },
+  "DOWNLOAD_APP_CLOSE": {
+    "xpath": [
+      "//button[@aria-label='Close']",
+      "//button[contains(@title, 'Close')]"
+    ]
+  },
+  "CONTINUE_TO_SIGN_IN": {
+    "xpath": [
+      "//span[contains(text(), 'Continue to sign in')]",
+      "//a[contains(., 'Continue to sign in')]",
+      "//*[contains(text(), 'Continue to sign in')]"
+    ]
+  },
+  "ATTACHMENT_REMINDER_SEND": {
+    "xpath": [
+      "//div[@role='dialog' and .//h2[contains(text(), 'Attachment reminder')]]//button[contains(., 'Send')]",
+      "//h2[contains(text(), 'Attachment reminder')]/following::button[contains(text(), 'Send')]"
+    ]
   }
 }
